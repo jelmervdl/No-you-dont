@@ -1,0 +1,367 @@
+<html>
+	<head>
+		<title>Options — No you don't</title>
+		<style>
+		#status {
+			display: none;
+			background: yellow;
+			color: black;
+			padding: 1em;
+		}
+		
+		#status.visible {
+			display: block;
+		}
+		
+		#status.ok {
+			background: green;
+			color: white;
+		}
+		
+		#status.error {
+			background: red;
+			color: white;
+		}
+
+		body {
+			font: 13px Helvetica, sans-serif;
+			padding: 16px;
+		}
+		
+		h1 {
+			font-weight: normal;
+			font-size: 200%;
+			color: #53637D;
+			text-shadow: white 0 1px 2px;
+			margin: 0;
+			padding: 0 0 4px 0; 
+		}
+		
+		input[type=text] {
+			-webkit-border-radius: 2px;
+			border: 1px solid #AAA;
+			font-size: inherit;
+			padding: 3px;
+		}
+
+		.page {
+			width: 800px;
+			display: table;
+		}
+		
+		.page > section {
+			display: table-row;
+		}
+
+		.page > section > * {
+			display: table-cell;
+			vertical-align: top;
+			padding: 17px 0 20px 0;
+			border-top: 1px solid #eee;
+		}
+
+		.page > section > h3 {
+			font-size: 105%;
+		}
+		
+		.page label {
+			margin: 5px 0;
+		}
+		
+		.page label.radio {
+			display: block;
+		}
+		
+		list {
+			display: block;
+			outline: none;
+			overflow: auto;
+			position: relative;
+		}
+		
+		.page list {
+			min-height: 192px;
+			border: 1px solid #D9D9D9;
+			border-radius: 2px;
+		}
+		
+		.page list > div {
+			display: block;
+			position: relative;
+			width: 100%;
+			height: 28px;
+			line-height: 28px;
+		}
+		
+		.page list > div:hover {
+			background: #BBCEE9;
+		}
+		
+		.page list > div > div {
+			float: left;
+			clear: both;
+		}
+		
+		.page list > div > button {
+			position: absolute;
+			right: 0;
+		}
+		
+		.page list .delete_btn {
+			-webkit-transition: .15s opacity;
+			background-color: transparent;
+			background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAOVBMVEX///8FBQUGBgYDAwMDAwMDAwMGBgYGBgYFBQUFBQUAAAAAAAAEBAQDAwMDAwMDAwMDAwMDAwMAAAAu6rMfAAAAE3RSTlMACwsPERIzNzk9PUZGSUxNT1dZm90FQAAAAFZJREFUeF6dzMkSgCAMA1ChLI1swv9/rNCxcie3l0l7HWa4BT9+P5mme0tf4TKDXK8wOiFElAIr0IZZrEeFQzDbvq+CabvCGo7QZjRY+XPrJMk5iQ/yAk4VAlt7sPbrAAAAAElFTkSuQmCC");
+			border: none;
+			display: block;
+			height: 16px;
+			opacity: 1;
+			width: 16px;
+		}
+		
+		#blocked-websites-list .favicon {
+			position: absolute;
+			top: 6px;
+			left: 6px;
+			height: 16px;
+		}
+		
+		#blocked-websites-list .hostname {
+			position: absolute;
+			left: 28px;
+		}
+		
+		#blocked-websites-list .blocked-hits {
+			position: absolute;
+			right: 30px;
+		}
+		
+		#blocked-websites-list .delete_btn {
+			position: absolute;
+			right: 4px;
+			top: 6px;
+			
+			display: none;
+		}
+		
+		#blocked-websites-list > div:hover .delete_btn {
+			display: block;
+		}
+		
+		#new-website-entry {
+			background: #D0D0D0;
+			position: absolute;
+			bottom: 0px;
+		}
+		
+		#new-website-entry .favicon {
+			top: 6px;
+		}
+		
+		#new-website-entry .hostname {
+			width: 400px;
+		}
+		
+		</style>
+	</head>
+	<body>
+		<h1>No you don't</h1>
+		<div id="status"></div>
+		<div class="page">
+			<section id="behavior">
+				<h3>Behavior</h3>
+				<div>
+					<label class="radio">
+						<input type="radio" name="behavior" value="close_tab">
+						<span>Close the tab when I try to access a blocked website.</span>
+					</label>
+					<label class="radio">
+						<input type="radio" name="behavior" value="show_page">
+						<span>Show an harassing page when I try to access a blocked website.</span>
+					</label>
+				</div>
+			</section>
+			<section id="blocked-websites">
+				<h3>Blocked websites</h3>
+				<div>
+					<list id="blocked-websites-list" role="listbox">
+						<div id="new-website-entry" role="listitem">
+							<div>
+								<img class="favicon" src="chrome://favicon/iconurl/undefined">
+								<input class="hostname" type="text" placeholder="Hostname" required>
+							</div>
+						</div>
+					</list>
+				</div>
+			</section>
+		</div>
+	</body>
+	<script>
+		var $ = function(expression) {
+			return document.querySelector(expression);
+		}
+		
+		var $$ = function(expression) {
+			return document.querySelectorAll(expression);
+		}
+		
+		function key(namespace, name)
+		{
+			return namespace + ":" + name;
+		}
+		
+		function namespace(key)
+		{
+			return key.split(":", 2)[0];
+		}
+		
+		function name(key)
+		{
+			return key.split(":", 2)[1];
+		}
+		
+		NodeList.prototype.map = function(callback)
+		{
+			for (var i = 0; i < this.length; ++i)
+				callback(this[i]);
+		}
+		
+		function Website(url, hits)
+		{
+			this.url = url;
+			
+			this.el = document.createElement("div");
+			this.el.role = "listitem";
+			this.el.className = "blocked-website";
+			
+			var row = document.createElement("div");
+			this.el.appendChild(row);
+			
+			var favicon_el = document.createElement("img");
+			favicon_el.className = "favicon";
+			favicon_el.src = "chrome://favicon/" + this.url;
+			row.appendChild(favicon_el);
+			
+			this.url_el = document.createElement("span");
+			this.url_el.className = "hostname";
+			this.url_el.innerText = this.url;
+			row.appendChild(this.url_el);
+			
+			this.hits_el = document.createElement("strong");
+			this.hits_el.className = "blocked-hits";
+			row.appendChild(this.hits_el);
+			
+			this.delete_btn = document.createElement("button");
+			this.delete_btn.className = "delete_btn";
+			this.el.appendChild(this.delete_btn);
+			
+			this.delete_btn.addEventListener("click", function(e) {
+				remove_website_from_list(url);
+			}, false);
+			
+			this.update(hits);
+		}
+		
+		Website.prototype.update = function(hits)
+		{
+			this.hits = hits;
+			this.hits_el.innerText = this.hits;
+		}
+		
+		var $sites = {};
+		
+		function add_website_to_list(url, hits)
+		{
+			var site = new Website(url, hits);
+			$sites[site.url] = site;
+			$("#blocked-websites-list").appendChild(site.el);
+		}
+		
+		function remove_website_from_list(hostname)
+		{
+			delete localStorage[key("site", hostname)];
+			
+			var site = $sites[hostname];
+			site.el.parentNode.removeChild(site.el);
+			delete $sites[hostname];
+		}
+		
+		function add_website(hostname, hits)
+		{
+			hostname = hostname.trim();
+			
+			if (hostname.length == 0)
+				return false;
+			
+			if (localStorage[key("site", hostname)])
+				return true;
+			
+			localStorage[key("site", hostname)] = hits || 0;
+			add_website_to_list(hostname, 0);
+			return true;
+		}
+		
+		function remove_website(hostname)
+		{
+			delete localStorage[key("site", hostname)];
+			
+			if ($sites[hostname])
+				remove_website_from_list(hostname);
+		}
+		
+		function update_websites_list()
+		{
+			for (var key in localStorage)
+			{
+				if (namespace(key) != 'site')
+					continue;
+				
+				var hostname = name(key);
+				add_website_to_list(hostname, localStorage[key]);
+			}
+		}
+		
+		function update_behavior(value)
+		{
+			$$("#behavior input[type=radio]").map(function(el) {
+				el.checked = el.value == value;
+			});
+		}
+		
+		$$("#behavior input[type=radio]").map(function(el) {
+			this.addEventListener("change", function(e) {
+				if (e.target.checked)
+					localStorage[key("option", "behavior")] = e.target.value;
+			});
+		});
+		
+		$("#new-website-entry input").addEventListener("keyup", function(e) {
+			if (e.keyCode == 13)
+				if (add_website(e.target.value))
+					e.target.value = "";
+		}, false);
+		
+		window.addEventListener("storage", function(e) {
+			switch (key(e.key))
+			{
+				case "site":
+					if (typeof $sites[name(e.key)] == "undefined")
+						add_website_to_list(name(e.key), e.value);
+					else if (e.value === null)
+						remove_website_from_list(name(e.key));
+					else
+						$sites[name(e.key)].update(e.value);
+					break;
+				
+				case "option":
+					if (name(e.key) == "behavior")
+						update_behavior(e.value);
+					break;
+			}
+		}, false);
+		
+		update_websites_list();
+		
+		update_behavior(localStorage[key("option", "behavior")] || "close_tab");
+		
+	</script>
+</html>

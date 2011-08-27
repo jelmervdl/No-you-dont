@@ -1,5 +1,10 @@
 <script>
 
+function key(namespace, name)
+{
+	return namespace + ":" + name;
+}
+
 function hostname(url)
 {
 	var m;
@@ -11,16 +16,37 @@ function hostname(url)
 
 function is_a_bad_url(url)
 {
-	return [
-		'www.reddit.com',
-		'reddit.com',
-		'news.ycombinator.com'
-	].indexOf(hostname(url)) !== -1;
+	return typeof localStorage[key("site", hostname(url))] != "undefined";
+}
+
+function count_hit(url)
+{
+	localStorage[key("site", hostname(url))]++;
+}
+
+function take_action(tab_id, url)
+{
+	switch (localStorage[key("option", "behavior")])
+	{
+		case "show_page":
+			chrome.tabs.update(tab_id, {
+				url: chrome.extension.getURL("blocked.html")
+			});
+			break;
+		
+		default:
+		case "close_tab":
+			chrome.tabs.remove(tab_id);
+			break;
+	}
 }
 
 chrome.tabs.onUpdated.addListener(function(tabId, changes, tab) {
 	if (changes.url && is_a_bad_url(changes.url))
-		chrome.tabs.remove(tabId);
+	{
+		take_action(tabId, changes.url);
+		count_hit(changes.url);
+	}
 });
 
 </script>
