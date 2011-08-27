@@ -1,0 +1,26 @@
+<script>
+
+function hostname(url)
+{
+    var m;
+    if (!(m = url.match(/^([^:]+):\/\/([^\/]+)\/?/)))
+        return null;
+    
+    return m[2];
+}
+
+function is_a_bad_url(url)
+{
+    return [
+        'www.reddit.com',
+        'reddit.com',
+        'news.ycombinator.com'
+    ].indexOf(hostname(url)) !== -1;
+}
+
+chrome.tabs.onUpdated.addListener(function(tabId, changes, tab) {
+    if (changes.url && is_a_bad_url(changes.url))
+        chrome.tabs.remove(tabId);
+});
+
+</script>

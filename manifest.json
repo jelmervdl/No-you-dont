@@ -1,0 +1,8 @@
+{
+    "name": "No you don't!",
+    "version": "1.0",
+    "background_page": "background.html",
+    "permissions": [
+        "tabs"
+    ]
+}
