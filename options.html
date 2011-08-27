@@ -94,7 +94,7 @@
 		}
 		
 		.page list > div:hover {
-			background: #BBCEE9;
+			background-color: #BBCEE9;
 		}
 		
 		.page list > div > div {
@@ -110,12 +110,16 @@
 		.page list .delete_btn {
 			-webkit-transition: .15s opacity;
 			background-color: transparent;
-			background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAOVBMVEX///8FBQUGBgYDAwMDAwMDAwMGBgYGBgYFBQUFBQUAAAAAAAAEBAQDAwMDAwMDAwMDAwMDAwMAAAAu6rMfAAAAE3RSTlMACwsPERIzNzk9PUZGSUxNT1dZm90FQAAAAFZJREFUeF6dzMkSgCAMA1ChLI1swv9/rNCxcie3l0l7HWa4BT9+P5mme0tf4TKDXK8wOiFElAIr0IZZrEeFQzDbvq+CabvCGo7QZjRY+XPrJMk5iQ/yAk4VAlt7sPbrAAAAAElFTkSuQmCC");
+			background: transparent url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAMAAAAoLQ9TAAAAOVBMVEX///8FBQUGBgYDAwMDAwMDAwMGBgYGBgYFBQUFBQUAAAAAAAAEBAQDAwMDAwMDAwMDAwMDAwMAAAAu6rMfAAAAE3RSTlMACwsPERIzNzk9PUZGSUxNT1dZm90FQAAAAFZJREFUeF6dzMkSgCAMA1ChLI1swv9/rNCxcie3l0l7HWa4BT9+P5mme0tf4TKDXK8wOiFElAIr0IZZrEeFQzDbvq+CabvCGo7QZjRY+XPrJMk5iQ/yAk4VAlt7sPbrAAAAAElFTkSuQmCC") center center no-repeat;
+			cursor: pointer;
 			border: none;
 			display: block;
 			height: 16px;
-			opacity: 1;
 			width: 16px;
+		}
+		
+		#blocked-websites-list {
+			padding-bottom: 28px;
 		}
 		
 		#blocked-websites-list .favicon {
@@ -138,9 +142,9 @@
 		#blocked-websites-list .delete_btn {
 			position: absolute;
 			right: 4px;
-			top: 6px;
-			
-			display: none;
+			top: 0;
+			height: 28px;
+			display: none; /* only shown on hover */
 		}
 		
 		#blocked-websites-list > div:hover .delete_btn {
@@ -238,7 +242,7 @@
 			
 			var favicon_el = document.createElement("img");
 			favicon_el.className = "favicon";
-			favicon_el.src = "chrome://favicon/" + this.url;
+			favicon_el.src = "chrome://favicon/http://" + this.url;
 			row.appendChild(favicon_el);
 			
 			this.url_el = document.createElement("span");
@@ -248,10 +252,12 @@
 			
 			this.hits_el = document.createElement("strong");
 			this.hits_el.className = "blocked-hits";
+			this.hits_el.title = "Number of times blocked";
 			row.appendChild(this.hits_el);
 			
 			this.delete_btn = document.createElement("button");
 			this.delete_btn.className = "delete_btn";
+			this.delete_btn.title = "Remove from list";
 			this.el.appendChild(this.delete_btn);
 			
 			this.delete_btn.addEventListener("click", function(e) {

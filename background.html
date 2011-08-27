@@ -5,7 +5,7 @@ function key(namespace, name)
 	return namespace + ":" + name;
 }
 
-function hostname(url)
+function get_hostname(url)
 {
 	var m;
 	if (!(m = url.match(/^([^:]+):\/\/([^\/]+)\/?/)))
@@ -14,17 +14,27 @@ function hostname(url)
 	return m[2];
 }
 
-function is_a_bad_url(url)
+function get_domain(hostname)
 {
-	return typeof localStorage[key("site", hostname(url))] != "undefined";
+	var m;
+	
+	if (!(m = hostname.match(/\.([^\.]+\.[^\.]+)$/)))
+		return hostname;
+	
+	return m[1];
 }
 
-function count_hit(url)
+function is_a_bad_url(hostname)
 {
-	localStorage[key("site", hostname(url))]++;
+	return typeof localStorage[key("site", hostname)] != "undefined";
 }
 
-function take_action(tab_id, url)
+function count_hit(hostname)
+{
+	localStorage[key("site", hostname)]++;
+}
+
+function take_action(tab_id, hostname)
 {
 	switch (localStorage[key("option", "behavior")])
 	{
@@ -39,14 +49,21 @@ function take_action(tab_id, url)
 			chrome.tabs.remove(tab_id);
 			break;
 	}
+	
+	count_hit(hostname);
 }
 
 chrome.tabs.onUpdated.addListener(function(tabId, changes, tab) {
-	if (changes.url && is_a_bad_url(changes.url))
-	{
-		take_action(tabId, changes.url);
-		count_hit(changes.url);
-	}
+	if (!changes.url)
+		return;
+	
+	var hostname = get_hostname(changes.url);
+	if (is_a_bad_url(hostname))
+		take_action(tabId, hostname);
+	
+	var domain = get_domain(hostname);
+	if (domain != hostname && is_a_bad_url(domain))
+		take_action(tabId, domain);
 });
 
 </script>
