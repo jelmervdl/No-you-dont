@@ -348,20 +348,20 @@
 		}, false);
 		
 		window.addEventListener("storage", function(e) {
-			switch (key(e.key))
+			switch (namespace(e.key))
 			{
 				case "site":
 					if (typeof $sites[name(e.key)] == "undefined")
-						add_website_to_list(name(e.key), e.value);
-					else if (e.value === null)
+						add_website_to_list(name(e.key), e.newValue);
+					else if (e.newValue === null)
 						remove_website_from_list(name(e.key));
 					else
-						$sites[name(e.key)].update(e.value);
+						$sites[name(e.key)].update(e.newValue);
 					break;
 				
 				case "option":
 					if (name(e.key) == "behavior")
-						update_behavior(e.value);
+						update_behavior(e.newValue);
 					break;
 			}
 		}, false);
