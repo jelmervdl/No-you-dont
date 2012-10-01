@@ -130,6 +130,10 @@ function update_behavior(value)
 		el.checked = el.value == value;
 	});
 }
+function update_message(value)
+{
+	$("#behavior input[name=message]").value = value;
+}
 
 $$("#behavior input[type=radio]").map(function(el) {
 	this.addEventListener("change", function(e) {
@@ -143,6 +147,10 @@ $("#new-website-entry input").addEventListener("keyup", function(e) {
 		if (add_website(e.target.value))
 			e.target.value = "";
 }, false);
+
+$("#behavior input[name=message]").addEventListener("keyup", function(e) {
+	localStorage[key("option", "message")] = e.target.value;
+});
 
 window.addEventListener("storage", function(e) {
 	switch (namespace(e.key))
@@ -159,6 +167,8 @@ window.addEventListener("storage", function(e) {
 		case "option":
 			if (name(e.key) == "behavior")
 				update_behavior(e.newValue);
+			else if (name(e.key) == "message")
+				update_message(e.newValue);
 			break;
 	}
 }, false);
@@ -166,3 +176,6 @@ window.addEventListener("storage", function(e) {
 update_websites_list();
 
 update_behavior(localStorage[key("option", "behavior")] || "show_page");
+
+update_message(localStorage[key("option", "message")] || "");
+

@@ -71,6 +71,10 @@
 		.page label.radio {
 			display: block;
 		}
+
+		.page label p {
+			margin: 0 0 0 23px;
+		}
 		
 		list {
 			display: block;
@@ -181,7 +185,11 @@
 					</label>
 					<label class="radio">
 						<input type="radio" name="behavior" value="show_page">
-						<span>Remind me of what I should do instead.</span>
+						<span>Remind me of what I should do instead:</span>
+						<p>
+							<span>Message:</span>
+							<input type="text" name="message" size="40">
+						</p>
 					</label>
 				</div>
 			</section>
