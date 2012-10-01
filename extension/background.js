@@ -1,5 +1,3 @@
-<script>
-
 function key(namespace, name)
 {
 	return namespace + ":" + name;
@@ -93,5 +91,3 @@ function main()
 update_plugin();
 
 main();
-
-</script>
