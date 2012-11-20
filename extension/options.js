@@ -40,7 +40,7 @@ function Website(url, hits)
 	
 	var favicon_el = document.createElement("img");
 	favicon_el.className = "favicon";
-	favicon_el.src = "chrome://favicon/http://" + this.url;
+	favicon_el.src = "chrome://favicon/size/16@2x/http://" + this.url;
 	row.appendChild(favicon_el);
 	
 	this.url_el = document.createElement("span");
