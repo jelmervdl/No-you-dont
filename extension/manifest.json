@@ -13,7 +13,5 @@
 		"http://*/*",
 		"https://*/*",
 		"chrome://favicon/"
-	],
-	"key": "MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDgRVUfT2D6ZZc2O0qZmpq842Q6r4QZcvMSzuIowJLAS+9tpw8Wrac0+yM2qL8ev/tlr0T001jyiQY6+9wHCCuEK2XV8NwpV+Fldl0W0AlugJeVoZCi7qCpEk9aDQomlqd6YjNLCNQj3uspCHqMaaWUiKce07Vrqbf4tH9E0hKBPwIDAQAB",
-	"update_url": "https://github.com/jelmervdl/No-you-dont/raw/master/updates.xml"
+	]
 }
