@@ -34,27 +34,24 @@ function count_hit(hostname)
 
 function take_action(tab_id, hostname)
 {
+	count_hit(hostname);
+	
 	switch (localStorage[key("option", "behavior")])
 	{
 		case "close_tab":
 			chrome.tabs.remove(tab_id);
-			break;
+			return {cancel: true};
 		
 		default:
 		case "show_page":
-			chrome.tabs.update(tab_id, {
-				url: chrome.extension.getURL("blocked.html")
-			});
-			break;
+			return {redirectUrl: chrome.extension.getURL("blocked.html")};
 	}
-	
-	count_hit(hostname);
 }
 
 function update_plugin()
 {
 	var k = key("option", "installed_version");
-	var version = parseInt(localStorage[k] || 0);
+	var version = parseInt(localStorage[k] || 0, 10);
 	
 	// version lower than 1? Probably first install
 	if (version < 1)
@@ -74,18 +71,23 @@ function update_plugin()
 
 function main()
 {
-	chrome.tabs.onUpdated.addListener(function(tabId, changes, tab) {
-		if (!changes.url)
+	var callback = function (details) {
+		if (!details.url)
 			return;
 	
-		var hostname = get_hostname(changes.url);
-		if (is_a_bad_url(hostname))
-			take_action(tabId, hostname);
-	
-		var domain = get_domain(hostname);
-		if (domain != hostname && is_a_bad_url(domain))
-			take_action(tabId, domain);
-	});
+		var hostname = get_hostname(details.url);
+		if (is_a_bad_url(hostname) || is_a_bad_url(get_domain(hostname)))
+			return take_action(details.tabId, hostname);
+	};
+
+	var filter = {
+		urls: ['http://*/*', 'https://*/*'],
+		types: ['main_frame']
+	};
+
+	var specs = ['blocking'];
+
+	chrome.webRequest.onBeforeRequest.addListener(callback, filter, specs);
 }
 
 update_plugin();
