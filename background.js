@@ -40,12 +40,15 @@ function take_action(tab_id, hostname)
 	{
 		case "close_tab":
 			chrome.tabs.remove(tab_id);
-			return {cancel: true};
-		
-		default:
+			break;
+
 		case "show_page":
-			return {redirectUrl: chrome.extension.getURL("blocked.html")};
+		default:
+			chrome.tabs.update(tab_id, {url: chrome.extension.getURL("blocked.html")});
+			break;
 	}
+
+	return {cancel: true};
 }
 
 function update_plugin()
